@@ -1,0 +1,6 @@
+# 统一行尾：源码与配置用 LF，Windows 批处理用 CRLF
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.jar binary
+*.png binary
