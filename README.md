@@ -3,6 +3,13 @@
 一套能跑起来的 Spring Boot 后端骨架：统一返回、全局异常、跨域、两套接口前缀。
 **不连数据库、不连 Redis、不做登录**——只保证「能启动、能发请求、返回结构统一」，业务模块在这个骨架上往后加。
 
+仓库：<https://github.com/TianCha101/dandanyun>
+
+```bash
+git clone https://github.com/TianCha101/dandanyun.git
+cd dandanyun
+```
+
 ## 环境要求
 
 | 项 | 版本 |
