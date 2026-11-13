@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dandanyun.system.SystemUserMapper">
+    <select id="findByUsername" resultType="com.dandanyun.system.SystemUser">
+        SELECT id,
+               username,
+               display_name,
+               password_hash,
+               role,
+               status,
+               created_at,
+               updated_at
+        FROM sys_user
+        WHERE username = #{username}
+        LIMIT 1
+    </select>
+</mapper>

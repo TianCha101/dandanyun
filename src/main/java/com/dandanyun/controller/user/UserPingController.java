@@ -1,5 +1,7 @@
 package com.dandanyun.controller.user;
 
+import com.dandanyun.auth.AuthContext;
+import com.dandanyun.auth.AuthenticatedUser;
 import com.dandanyun.common.Result;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,5 +17,10 @@ public class UserPingController {
     @GetMapping("/ping")
     public Result<String> ping() {
         return Result.ok("user ok");
+    }
+
+    @GetMapping("/me")
+    public Result<AuthenticatedUser> me() {
+        return Result.ok(AuthContext.require());
     }
 }

@@ -26,11 +26,11 @@ if not exist "target\dandanyun-server-0.0.1-SNAPSHOT.jar" (
 
 echo === 启动 点单云 ===
 echo   健康检查  http://localhost:8080/health
-echo   管理端    http://localhost:8080/admin/ping
-echo   用户端    http://localhost:8080/user/ping
-echo   异常示例  http://localhost:8080/admin/boom
+echo   就绪检查  http://localhost:8080/health/ready
+echo   管理端登录 POST http://localhost:8080/auth/admin/login
+echo   用户端登录 POST http://localhost:8080/auth/user/login
+echo   数据库密码请通过 DB_PASSWORD 环境变量提供。
 echo 关闭窗口即停止服务。
 echo.
-start "" http://localhost:8080/health
 java -jar target\dandanyun-server-0.0.1-SNAPSHOT.jar
 pause

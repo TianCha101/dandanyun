@@ -2,8 +2,10 @@ package com.dandanyun.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,9 +25,14 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(BusinessException.class)
-    public Result<Void> handleBusiness(BusinessException e) {
+    public ResponseEntity<Result<Void>> handleBusiness(BusinessException e) {
         log.warn("业务异常: {}", e.getMessage());
-        return Result.fail(e.getCode(), e.getMessage());
+        HttpStatus status = HttpStatus.resolve(e.getCode());
+        if (status == null || !status.is4xxClientError()) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status)
+                .body(Result.fail(e.getCode(), e.getMessage()));
     }
 
     /**
@@ -51,9 +58,38 @@ public class GlobalExceptionHandler {
                 .body(Result.fail(400, "请求参数有误"));
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Result<Void>> handleUnreadableBody(HttpMessageNotReadableException e) {
+        log.warn("请求体无法解析: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Result.fail(400, "请求体格式不正确"));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Result<Void>> handleAuthentication(AuthenticationException e) {
+        log.warn("身份认证失败: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Result.fail(401, e.getMessage()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Result<Void>> handleAccessDenied(AccessDeniedException e) {
+        log.warn("权限不足: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Result.fail(403, e.getMessage()));
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<Result<Void>> handleDataAccess(DataAccessException e) {
+        log.error("数据库访问失败", e);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Result.fail(503, "数据库暂不可用，请检查连接配置"));
+    }
+
     @ExceptionHandler(Exception.class)
-    public Result<Void> handleOther(Exception e) {
+    public ResponseEntity<Result<Void>> handleOther(Exception e) {
         log.error("系统异常", e);
-        return Result.fail(500, "服务器开小差了，请稍后再试");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Result.fail(500, "服务器开小差了，请稍后再试"));
     }
 }

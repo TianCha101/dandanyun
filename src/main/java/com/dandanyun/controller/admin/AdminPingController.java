@@ -1,5 +1,7 @@
 package com.dandanyun.controller.admin;
 
+import com.dandanyun.auth.AuthContext;
+import com.dandanyun.auth.AuthenticatedUser;
 import com.dandanyun.common.BusinessException;
 import com.dandanyun.common.Result;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +19,11 @@ public class AdminPingController {
     @GetMapping("/ping")
     public Result<String> ping() {
         return Result.ok("admin ok");
+    }
+
+    @GetMapping("/me")
+    public Result<AuthenticatedUser> me() {
+        return Result.ok(AuthContext.require());
     }
 
     @GetMapping("/boom")

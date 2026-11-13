@@ -4,11 +4,52 @@ server:
     encoding:
       charset: UTF-8
       force: true
+  shutdown: graceful
 
 spring:
   application:
     name: dandanyun
+  datasource:
+    url: ${DB_URL:jdbc:mysql://127.0.0.1:3306/dandanyun?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      minimum-idle: 1
+      connection-timeout: 3000
+      initialization-fail-timeout: -1
+  sql:
+    init:
+      mode: ${DB_INIT_MODE:never}
+      schema-locations: classpath:db/init/schema.sql
+      data-locations: classpath:db/init/data.sql
+      encoding: UTF-8
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    default-fetch-size: 100
+    default-statement-timeout: 10
+
+app:
+  cors:
+    allowed-origin-patterns:
+      - http://localhost:*
+      - http://127.0.0.1:*
+  security:
+    jwt:
+      issuer: dandanyun
+      secret: ${DANDANYUN_JWT_SECRET:dev-only-change-me-please-32-bytes-minimum-secret}
+      expiration-seconds: ${DANDANYUN_JWT_EXPIRATION_SECONDS:7200}
+    password:
+      iterations: ${DANDANYUN_PASSWORD_ITERATIONS:120000}
 
 logging:
   level:
     com.dandanyun: debug
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{requestId:-}] %logger{36} - %msg%n"

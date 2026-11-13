@@ -21,11 +21,14 @@ if not defined JAVA_HOME (
 echo JAVA_HOME = %JAVA_HOME%
 
 rem ---- 找 mvn：PATH 里没有就用 IDEA 自带的 ----
+set "MVN="
 where mvn >nul 2>nul
 if errorlevel 1 (
-  if exist "%ProgramFiles%\JetBrains" (
-    for /d %%d in ("%ProgramFiles%\JetBrains\*") do (
-      if exist "%%d\plugins\maven-plugin\lib\maven3\bin\mvn.cmd" set "MVN=%%d\plugins\maven-plugin\lib\maven3\bin\mvn.cmd"
+  for %%r in (C D E F) do (
+    if exist "%%r:\Program Files\JetBrains" (
+      for /d %%d in ("%%r:\Program Files\JetBrains\*") do (
+        if exist "%%d\plugins\maven-plugin\lib\maven3\bin\mvn.cmd" set "MVN=%%d\plugins\maven-plugin\lib\maven3\bin\mvn.cmd"
+      )
     )
   )
 ) else (
@@ -37,8 +40,8 @@ if not defined MVN (
   exit /b 1
 )
 
-echo === 编译打包 ===
-call "%MVN%" -B -DskipTests package
+echo === 编译、测试、打包 ===
+call "%MVN%" -B "-Dmaven.repo.local=%USERPROFILE%\.m2\repository" clean package
 if errorlevel 1 (
   echo.
   echo 构建失败，看上面的报错。
